@@ -1,19 +1,25 @@
-function [U,S,V] = blocksvd(A, iter, k, tall)
+function [U,S,V] = blocksvd_radmAMM(A, iter, k, tall, nsamp)
     
     d = min(size(A));
     n = max(size(A));
-
-    
+    m = nsamp;
     if(tall==0)
         A=A';
     end
     A_act = A;
     
+    %perform Rademacher sketching on A here (S should be m*n in size)
+%     p = 0.5;
+%     S = (1/sqrt(nsamp)).*binornd(1, p*ones(m,n));
+    
+    S = (1/nsamp^0.5).*randsrc(m, n);
+    A = S*A;
+    %end sketching here (make A = S*A)
     
     PI = randn(d,k);
     [PI,~] = qr(PI,0);
     K  = zeros(d, k*iter);
-
+    
     
     for i=1:iter
         PI = A'*A*PI;

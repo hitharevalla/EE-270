@@ -1,19 +1,22 @@
-function [U,S,V] = blocksvd(A, iter, k, tall)
+function [U,S,V] = blocksvd_normalAMM(A, iter, k, tall, nsamp)
     
     d = min(size(A));
     n = max(size(A));
-
-    
+    m = nsamp;
     if(tall==0)
         A=A';
     end
     A_act = A;
     
+    %perform sketching on A here (S should be m*n in size)
+    S = 1/(nsamp^0.5)*randn(m, n);
+    A = S*A;
+    %end sketching (A=S*A)
     
     PI = randn(d,k);
     [PI,~] = qr(PI,0);
     K  = zeros(d, k*iter);
-
+    
     
     for i=1:iter
         PI = A'*A*PI;
@@ -23,7 +26,7 @@ function [U,S,V] = blocksvd(A, iter, k, tall)
 
     [Q, ~] = qr(K,0);
     T = A_act*Q;
-
+    %T = A*Q;
     [Ut, St, Vt] = svd(T,0);
     
     S = St(1:k, 1:k);

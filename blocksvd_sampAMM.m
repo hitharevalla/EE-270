@@ -1,19 +1,22 @@
-function [U,S,V] = blocksvd(A, iter, k, tall)
+function [U,S,V] = blocksvd_sampAMM(A, iter, k, tall, nsamp)
     
     d = min(size(A));
     n = max(size(A));
-
-    
+    m = nsamp;
     if(tall==0)
         A=A';
     end
     A_act = A;
     
+    %perform Random sampling sketching on A here (Sample m rows out of n)
+    rows = randsample(n, m, true);
+    A = A(rows, :);
+    %end sketching here (make A = S*A)
     
     PI = randn(d,k);
     [PI,~] = qr(PI,0);
     K  = zeros(d, k*iter);
-
+    
     
     for i=1:iter
         PI = A'*A*PI;
